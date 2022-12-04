@@ -110,12 +110,15 @@ pub fn app_server() {
 
                         let reader = env.read().expect("reader");
                         if let Some(val) = store.get(&reader, &id).unwrap() {
-                            stream.write(&val.to_bytes().unwrap()).unwrap();
-                        } else {
-                            stream
-                                .write(format!("invalid id {}", id).as_bytes())
-                                .unwrap();
+                            if let Value::Str(val_str) = val {
+                                stream.write(val_str.as_bytes()).unwrap();
+                                continue;
+                            }
                         }
+
+                        stream
+                            .write(format!("invalid id: {}", id).as_bytes())
+                            .unwrap();
                     }
                     Some(&_) => todo!(),
                     None => todo!(),
