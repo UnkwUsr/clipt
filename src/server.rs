@@ -40,7 +40,7 @@ pub fn app_server() {
 
     // db shit end
 
-    println!("Server started, waiting for clients");
+    println!("Server started");
 
     for stream in listener.incoming() {
         match stream {
@@ -63,22 +63,17 @@ pub fn app_server() {
                         println!("list");
 
                         let reader = env.read().expect("reader");
-                        store.iter_start(&reader).unwrap().for_each(|x| {
-                            let row = x.unwrap();
-                            stream
-                                .write(
-                                    format!(
-                                        "{}:{}\n",
-                                        String::from_utf8_lossy(row.0),
-                                        String::from_utf8_lossy(
-                                            row.1.to_bytes().unwrap().as_slice()
-                                        ),
-                                    )
-                                    .as_bytes(),
-                                )
-                                .unwrap();
-                        });
-                        // stream.flush().unwrap();
+                        store
+                            .iter_start(&reader)
+                            .unwrap()
+                            .for_each(|x| match x.unwrap() {
+                                (key, Value::Str(val)) => {
+                                    let key = String::from_utf8_lossy(key);
+                                    let row = format!("{}:{}\n", key, val);
+                                    stream.write(row.as_bytes()).unwrap();
+                                }
+                                _ => {}
+                            });
                     }
                     Some("pick") => {
                         println!("pick");
