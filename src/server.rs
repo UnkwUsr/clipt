@@ -82,17 +82,20 @@ pub fn app_server() {
 
                         let reader = env.read().expect("reader");
                         if let Some(val) = store.get(&reader, &id).unwrap() {
-                            let mut writer = env.write().unwrap();
-                            store.delete(&mut writer, &id).unwrap();
-                            store.put(&mut writer, get_timestamp(), &val).unwrap();
-                            writer.commit().unwrap();
+                            if let Value::Str(val_str) = val {
+                                let mut writer = env.write().unwrap();
+                                store.delete(&mut writer, &id).unwrap();
+                                store.put(&mut writer, get_timestamp(), &val).unwrap();
+                                writer.commit().unwrap();
 
-                            stream.write(&val.to_bytes().unwrap()).unwrap();
-                        } else {
-                            stream
-                                .write(format!("invalid id {}", id).as_bytes())
-                                .unwrap();
+                                stream.write(val_str.as_bytes()).unwrap();
+                                continue;
+                            }
                         }
+
+                        stream
+                            .write(format!("invalid id: {}", id).as_bytes())
+                            .unwrap();
                     }
                     Some("delete") => {
                         println!("delete");
