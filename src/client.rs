@@ -19,7 +19,7 @@ pub fn client_list() {
     stream.shutdown(std::net::Shutdown::Write).unwrap();
 
     let buf = recv_message(&mut stream);
-    println!("{}", buf);
+    print!("{}", buf);
 }
 
 pub fn client_pick(id: &str) {
@@ -30,7 +30,7 @@ pub fn client_pick(id: &str) {
     stream.shutdown(std::net::Shutdown::Write).unwrap();
 
     let buf = recv_message(&mut stream);
-    println!("{}", buf);
+    print!("{}", buf);
 }
 
 pub fn client_delete(id: &str) {
@@ -48,7 +48,7 @@ pub fn client_peek(id: &str) {
     stream.shutdown(std::net::Shutdown::Write).unwrap();
 
     let buf = recv_message(&mut stream);
-    println!("{}", buf);
+    print!("{}", buf);
 }
 
 fn send_message(stream: &mut UnixStream, message: &str) {
