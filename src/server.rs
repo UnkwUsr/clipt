@@ -99,6 +99,15 @@ pub fn app_server() {
                                 .unwrap();
                         }
                     }
+                    Some("delete") => {
+                        println!("delete");
+
+                        let id: String = asd.collect();
+
+                        let mut writer = env.write().unwrap();
+                        store.delete(&mut writer, id).unwrap();
+                        writer.commit().unwrap();
+                    }
                     Some(&_) => todo!(),
                     None => todo!(),
                 }

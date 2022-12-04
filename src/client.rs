@@ -33,6 +33,13 @@ pub fn client_pick(id: &str) {
     println!("{}", buf);
 }
 
+pub fn client_delete(id: &str) {
+    let mut stream = connect_socket();
+
+    let message = format!("delete\n{}", id);
+    send_message(&mut stream, &message);
+}
+
 fn send_message(stream: &mut UnixStream, message: &str) {
     stream
         .write_all(message.as_bytes())

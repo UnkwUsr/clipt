@@ -13,6 +13,7 @@ fn main() {
         .subcommand(Command::new("put"))
         .subcommand(Command::new("list"))
         .subcommand(Command::new("pick").arg(Arg::new("id").index(1).required(true)))
+        .subcommand(Command::new("delete").arg(Arg::new("id").index(1).required(true)))
         .get_matches();
 
     match cmd.subcommand_name() {
@@ -20,13 +21,22 @@ fn main() {
         Some("put") => client::client_put(),
         Some("list") => client::client_list(),
         Some("pick") => {
-            let asd = cmd
+            let id = cmd
                 .subcommand_matches("pick")
                 .unwrap()
                 .get_one::<String>("id")
                 .unwrap();
 
-            client::client_pick(asd);
+            client::client_pick(id);
+        }
+        Some("delete") => {
+            let id = cmd
+                .subcommand_matches("delete")
+                .unwrap()
+                .get_one::<String>("id")
+                .unwrap();
+
+            client::client_delete(id);
         }
         _ => unreachable!("parser should ensure only valid subcommand names are used"),
     }
