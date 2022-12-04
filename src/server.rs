@@ -1,4 +1,5 @@
 use crate::shared::SOCKET_PATH;
+use std::os::unix::prelude::OsStrExt;
 
 use std::io::{BufRead, BufReader, Read, Write};
 use std::os::unix::net::UnixListener;
@@ -39,6 +40,21 @@ pub fn app_server() {
     let store = env.open_single("mydb", StoreOptions::create()).unwrap();
 
     // db shit end
+
+    let mut writer = env.write().unwrap();
+
+    let paths = std::fs::read_dir("/home/meda/.local/share/rclip/UTF8_STRING").unwrap();
+    for path in paths {
+        let path = path.unwrap().path();
+        let id = path.file_name().unwrap().as_bytes();
+        let content = String::from_utf8(std::fs::read(&path).unwrap()).unwrap();
+
+        store.put(&mut writer, id, &Value::Str(&content)).unwrap();
+    }
+
+    writer.commit().unwrap();
+
+    return;
 
     println!("Server started");
 
