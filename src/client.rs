@@ -22,7 +22,7 @@ pub fn client_list() {
     print!("{}", buf);
 }
 
-pub fn client_pick(id: &str) {
+pub fn client_pick(id: &usize) {
     let mut stream = connect_socket();
 
     let message = format!("pick\n{}", id);
@@ -46,7 +46,7 @@ pub fn client_delete(ids: Vec<&usize>) {
     send_message(&mut stream, &message);
 }
 
-pub fn client_peek(id: &str) {
+pub fn client_peek(id: &usize) {
     let mut stream = connect_socket();
 
     let message = format!("peek\n{}", id);

@@ -3,10 +3,6 @@ name = "clipt"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
-# lmdb = "0.8.0"
 rkv = "0.18.3"
 clap = "4.0.29"
-# sqlite = "0.30.2"

@@ -6,15 +6,30 @@ use clap::{Arg, ArgAction, Command};
 
 fn main() {
     let cmd = Command::new(env!("CARGO_CRATE_NAME"))
-        // .arg_required_else_help(true)
-        // .subcommand_value_name("APPLET")
-        // .subcommand_help_heading("APPLETS")
-        .subcommand(Command::new("server").about("server"))
-        .subcommand(Command::new("put"))
-        .subcommand(Command::new("list"))
-        .subcommand(Command::new("pick").arg(Arg::new("id").index(1).required(true)))
+        .arg_required_else_help(true)
+        .subcommand(Command::new("server").about("Start server"))
+        .subcommand(Command::new("put").about("Put new item"))
+        .subcommand(Command::new("list").about("List all items"))
         .subcommand(
-            Command::new("delete").arg(
+            Command::new("pick")
+                .about("Print item by id and make it newest")
+                .arg(
+                    Arg::new("id")
+                        .index(1)
+                        .required(true)
+                        .value_parser(clap::value_parser!(usize)),
+                ),
+        )
+        .subcommand(
+            Command::new("peek").about("Print item by id").arg(
+                Arg::new("id")
+                    .index(1)
+                    .required(true)
+                    .value_parser(clap::value_parser!(usize)),
+            ),
+        )
+        .subcommand(
+            Command::new("delete").about("Delete items by ids").arg(
                 Arg::new("id")
                     .index(1)
                     .required(true)
@@ -22,7 +37,6 @@ fn main() {
                     .action(ArgAction::Append),
             ),
         )
-        .subcommand(Command::new("peek").arg(Arg::new("id").index(1).required(true)))
         .get_matches();
 
     match cmd.subcommand_name() {
@@ -33,10 +47,19 @@ fn main() {
             let id = cmd
                 .subcommand_matches("pick")
                 .unwrap()
-                .get_one::<String>("id")
+                .get_one::<usize>("id")
                 .unwrap();
 
             client::client_pick(id);
+        }
+        Some("peek") => {
+            let id = cmd
+                .subcommand_matches("peek")
+                .unwrap()
+                .get_one::<usize>("id")
+                .unwrap();
+
+            client::client_peek(id);
         }
         Some("delete") => {
             let ids: Vec<&usize> = cmd
@@ -48,23 +71,6 @@ fn main() {
 
             client::client_delete(ids);
         }
-        Some("peek") => {
-            let id = cmd
-                .subcommand_matches("peek")
-                .unwrap()
-                .get_one::<String>("id")
-                .unwrap();
-
-            client::client_peek(id);
-        }
-        _ => unreachable!("parser should ensure only valid subcommand names are used"),
+        _ => unreachable!("as arg_required_else_help() is used"),
     }
-
-    // match matches.subcommand() {
-    //     Some(("server", _)) => server::app_server(),
-    //     Some(("put", _)) => client::client_put(),
-    //     Some(("list", _)) => client::client_list(),
-    //     Some(("pick", _)) => client::client_pick(&23.to_string()),
-    //     _ => {}
-    // }
 }
