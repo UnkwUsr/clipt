@@ -40,6 +40,17 @@ pub fn client_delete(id: &str) {
     send_message(&mut stream, &message);
 }
 
+pub fn client_peek(id: &str) {
+    let mut stream = connect_socket();
+
+    let message = format!("peek\n{}", id);
+    send_message(&mut stream, &message);
+    stream.shutdown(std::net::Shutdown::Write).unwrap();
+
+    let buf = recv_message(&mut stream);
+    println!("{}", buf);
+}
+
 fn send_message(stream: &mut UnixStream, message: &str) {
     stream
         .write_all(message.as_bytes())

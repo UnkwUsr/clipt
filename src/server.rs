@@ -68,7 +68,7 @@ pub fn app_server() {
                             stream
                                 .write(
                                     format!(
-                                        "{}: {}\n",
+                                        "{}:{}\n",
                                         String::from_utf8_lossy(row.0),
                                         String::from_utf8_lossy(
                                             row.1.to_bytes().unwrap().as_slice()
@@ -107,6 +107,20 @@ pub fn app_server() {
                         let mut writer = env.write().unwrap();
                         store.delete(&mut writer, id).unwrap();
                         writer.commit().unwrap();
+                    }
+                    Some("peek") => {
+                        println!("peek");
+
+                        let id: String = asd.collect();
+
+                        let reader = env.read().expect("reader");
+                        if let Some(val) = store.get(&reader, &id).unwrap() {
+                            stream.write(&val.to_bytes().unwrap()).unwrap();
+                        } else {
+                            stream
+                                .write(format!("invalid id {}", id).as_bytes())
+                                .unwrap();
+                        }
                     }
                     Some(&_) => todo!(),
                     None => todo!(),

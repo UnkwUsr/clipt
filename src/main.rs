@@ -14,6 +14,7 @@ fn main() {
         .subcommand(Command::new("list"))
         .subcommand(Command::new("pick").arg(Arg::new("id").index(1).required(true)))
         .subcommand(Command::new("delete").arg(Arg::new("id").index(1).required(true)))
+        .subcommand(Command::new("peek").arg(Arg::new("id").index(1).required(true)))
         .get_matches();
 
     match cmd.subcommand_name() {
@@ -37,6 +38,15 @@ fn main() {
                 .unwrap();
 
             client::client_delete(id);
+        }
+        Some("peek") => {
+            let id = cmd
+                .subcommand_matches("peek")
+                .unwrap()
+                .get_one::<String>("id")
+                .unwrap();
+
+            client::client_peek(id);
         }
         _ => unreachable!("parser should ensure only valid subcommand names are used"),
     }
