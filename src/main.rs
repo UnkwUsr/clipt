@@ -2,7 +2,7 @@ mod client;
 mod server;
 mod shared;
 
-use clap::{Arg, Command};
+use clap::{Arg, ArgAction, Command};
 
 fn main() {
     let cmd = Command::new(env!("CARGO_CRATE_NAME"))
@@ -13,7 +13,15 @@ fn main() {
         .subcommand(Command::new("put"))
         .subcommand(Command::new("list"))
         .subcommand(Command::new("pick").arg(Arg::new("id").index(1).required(true)))
-        .subcommand(Command::new("delete").arg(Arg::new("id").index(1).required(true)))
+        .subcommand(
+            Command::new("delete").arg(
+                Arg::new("id")
+                    .index(1)
+                    .required(true)
+                    .value_parser(clap::value_parser!(usize))
+                    .action(ArgAction::Append),
+            ),
+        )
         .subcommand(Command::new("peek").arg(Arg::new("id").index(1).required(true)))
         .get_matches();
 
@@ -31,13 +39,14 @@ fn main() {
             client::client_pick(id);
         }
         Some("delete") => {
-            let id = cmd
+            let ids: Vec<&usize> = cmd
                 .subcommand_matches("delete")
                 .unwrap()
-                .get_one::<String>("id")
-                .unwrap();
+                .get_many::<usize>("id")
+                .unwrap()
+                .collect();
 
-            client::client_delete(id);
+            client::client_delete(ids);
         }
         Some("peek") => {
             let id = cmd

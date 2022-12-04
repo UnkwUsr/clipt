@@ -33,10 +33,16 @@ pub fn client_pick(id: &str) {
     print!("{}", buf);
 }
 
-pub fn client_delete(id: &str) {
+pub fn client_delete(ids: Vec<&usize>) {
     let mut stream = connect_socket();
 
-    let message = format!("delete\n{}", id);
+    let message = format!(
+        "delete\n{}",
+        ids.iter()
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>()
+            .join("\n")
+    );
     send_message(&mut stream, &message);
 }
 

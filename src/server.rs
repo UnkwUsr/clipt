@@ -107,11 +107,12 @@ pub fn app_server() {
                     "delete" => {
                         println!("delete");
 
-                        let mut id = String::new();
-                        bufreader.read_to_string(&mut id).unwrap();
+                        let ids = bufreader.lines();
 
                         let mut writer = env.write().unwrap();
-                        store.delete(&mut writer, id).unwrap();
+                        for id in ids {
+                            store.delete(&mut writer, id.unwrap()).unwrap();
+                        }
                         writer.commit().unwrap();
                     }
                     "peek" => {
