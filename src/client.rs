@@ -27,6 +27,10 @@ pub fn client_pick(id: &str) {
 
     let message = format!("pick\n{}", id);
     send_message(&mut stream, &message);
+    stream.shutdown(std::net::Shutdown::Write).unwrap();
+
+    let buf = recv_message(&mut stream);
+    println!("{}", buf);
 }
 
 fn send_message(stream: &mut UnixStream, message: &str) {
