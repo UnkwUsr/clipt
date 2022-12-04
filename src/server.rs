@@ -74,6 +74,7 @@ pub fn app_server() {
                             .for_each(|x| match x.unwrap() {
                                 (key, Value::Str(val)) => {
                                     let key = String::from_utf8_lossy(key);
+                                    let val = val.replace("\n", " ");
                                     let row = format!("{}:{}\n", key, val);
                                     stream.write(row.as_bytes()).unwrap();
                                 }
