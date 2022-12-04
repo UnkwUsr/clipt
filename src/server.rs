@@ -1,6 +1,6 @@
 use crate::shared::SOCKET_PATH;
 
-use std::io::{Read, Write};
+use std::io::{BufRead, BufReader, Read, Write};
 use std::os::unix::net::UnixListener;
 
 use rkv::backend::{SafeMode, SafeModeEnvironment};
@@ -45,13 +45,18 @@ pub fn app_server() {
     for stream in listener.incoming() {
         match stream {
             Ok(mut stream) => {
-                let mut buf = String::new();
-                stream.read_to_string(&mut buf).unwrap();
-                let mut asd = buf.lines();
-                match asd.next() {
-                    Some("put") => {
-                        let text: String = asd.collect();
+                let mut bufreader = BufReader::new(&stream);
+
+                let mut mode = String::new();
+                bufreader.read_line(&mut mode).unwrap();
+
+                match mode.trim_end() {
+                    "put" => {
                         println!("put");
+
+                        let mut text = String::new();
+                        bufreader.read_to_string(&mut text).unwrap();
+                        println!("text is: {:?}", text);
 
                         let mut writer = env.write().unwrap();
                         store
@@ -59,7 +64,7 @@ pub fn app_server() {
                             .unwrap();
                         writer.commit().unwrap();
                     }
-                    Some("list") => {
+                    "list" => {
                         println!("list");
 
                         let reader = env.read().expect("reader");
@@ -75,10 +80,11 @@ pub fn app_server() {
                                 _ => {}
                             });
                     }
-                    Some("pick") => {
+                    "pick" => {
                         println!("pick");
 
-                        let id: String = asd.collect();
+                        let mut id = String::new();
+                        bufreader.read_to_string(&mut id).unwrap();
 
                         let reader = env.read().expect("reader");
                         if let Some(val) = store.get(&reader, &id).unwrap() {
@@ -97,19 +103,21 @@ pub fn app_server() {
                             .write(format!("invalid id: {}", id).as_bytes())
                             .unwrap();
                     }
-                    Some("delete") => {
+                    "delete" => {
                         println!("delete");
 
-                        let id: String = asd.collect();
+                        let mut id = String::new();
+                        bufreader.read_to_string(&mut id).unwrap();
 
                         let mut writer = env.write().unwrap();
                         store.delete(&mut writer, id).unwrap();
                         writer.commit().unwrap();
                     }
-                    Some("peek") => {
+                    "peek" => {
                         println!("peek");
 
-                        let id: String = asd.collect();
+                        let mut id = String::new();
+                        bufreader.read_to_string(&mut id).unwrap();
 
                         let reader = env.read().expect("reader");
                         if let Some(val) = store.get(&reader, &id).unwrap() {
@@ -123,8 +131,7 @@ pub fn app_server() {
                             .write(format!("invalid id: {}", id).as_bytes())
                             .unwrap();
                     }
-                    Some(&_) => todo!(),
-                    None => todo!(),
+                    mode => unimplemented!("mode {}", mode),
                 }
             }
             Err(err) => {
