@@ -71,6 +71,6 @@ fn main() {
 
             client::client_delete(ids);
         }
-        _ => unreachable!("as arg_required_else_help() is used"),
+        _ => unreachable!("unreachable because arg_required_else_help() is used"),
     }
 }

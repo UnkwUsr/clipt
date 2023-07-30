@@ -57,6 +57,8 @@ pub fn client_peek(id: &usize) {
     print!("{}", buf);
 }
 
+// utils
+
 fn send_message(stream: &mut UnixStream, message: &str) {
     stream
         .write_all(message.as_bytes())

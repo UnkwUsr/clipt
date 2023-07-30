@@ -15,6 +15,7 @@ pub fn app_server() {
     let socket = Path::new(SOCKET_PATH);
     // Delete old socket if necessary
     if socket.exists() {
+        // TODO: not sure about that. Probably unsafe
         std::fs::remove_file(&socket).unwrap();
     }
     // Bind to socket
@@ -23,7 +24,7 @@ pub fn app_server() {
         Ok(stream) => stream,
     };
 
-    // db shit
+    // db open
 
     let path = Path::new(DB_PATH);
     fs::create_dir_all(path).unwrap();
@@ -38,7 +39,7 @@ pub fn app_server() {
     // Then you can use the environment handle to get a handle to a datastore:
     let store = env.open_single("mydb", StoreOptions::create()).unwrap();
 
-    // db shit end
+    // db open end
 
     println!("Server started");
 
